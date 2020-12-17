@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>短縮URL生成サイト(Beta) - s.moqs.net</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="s.moqs.net">
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/8.11.8/sweetalert2.all.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/8.11.8/sweetalert2.css" />
+	<script src="https://www.google.com/recaptcha/api.js"></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-149835434-1"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', '');
+	</script>
+	<script type="text/javascript">
+		function create() {
+			var url = document.getElementById('url').value;
+			if (url.length == 0) {
+				document.getElementById('url-error').innerHTML = "URL を入力してください。";
+				return;
+			} else {
+				document.getElementById('url-error').innerHTML = "";
+			}
+
+			var response = grecaptcha.getResponse();
+			if (response.length == 0) {
+				document.getElementById('gr-error').innerHTML = "reCAPTCHA チャレンジを成功させてください。";
+				return;
+			} else {
+				document.getElementById('gr-error').innerHTML = "";
+			}
+
+			$.getJSON('generate.php?url=' + url + "&response=" + response, function(data) {
+				if (!data.response) {
+					Swal.fire('エラー', 'reCAPTCHA のエラーかURLの形式が間違っています。やり直してください。', 'error');
+					return;
+				}
+				Swal.fire('URLを生成しました。', '<a href="' + data.url + '" target="_blank">' + data.url + '</a>', 'success');
+			});
+		}
+
+		function licence() {
+			Swal.fire('Open Source License', '<a href="https://github.com/jquery/jquery" target="_blank">jquery<br/>The MIT License<br/>Copyright JS Foundation and other contributors, https://js.foundation/</a><br/><br/><a href="https://github.com/sweetalert2/sweetalert2" target="_blank">Sweetalert2<br/>The MIT License<br/>Copyright (c) 2014 Tristan Edwards & Limon Monte</a>', 'info');
+		}
+	</script>
+</head>
+<body class="is-loading">
+	<div id="wrapper">
+		<section id="main">
+			<header>
+				<h1>短縮URL生成サイト</h1>
+				<div class="field">
+					<div id="url-error" style="color:red;"></div>
+					<input type="text" name="url" id="url" placeholder="URL"/>
+				</div>
+				<br/>
+				<center>
+					<div id="gr-error" style="color:red;"></div>
+					<div class="g-recaptcha" data-callback="clearcall" data-sitekey=""></div>
+				</center>
+				<br/>
+				<a onclick="return create();" class="button">生成</a>
+			</header>
+		</section>
+		<footer id="footer">
+			<ul class="copyright">
+				<li>&copy; <a href="https://twitter.com/moq_p_" target="_blank">moqs.net</a></li>
+				<li>Design: <a href="https://html5up.net" target="_blank">HTML5 UP</a></li>
+				<li><a onclick="return licence();">Open Source Licence</a></li>
+			</ul>
+		</footer>
+	</div>
+	<script>
+		if ('addEventListener' in window) {
+			window.addEventListener('load', function() { document.body.className = document.body.className.replace(/\bis-loading\b/, ''); });
+			document.body.className += (navigator.userAgent.match(/(MSIE|rv:11\.0)/) ? ' is-ie' : '');
+		}
+	</script>
+</body>
+</html>
